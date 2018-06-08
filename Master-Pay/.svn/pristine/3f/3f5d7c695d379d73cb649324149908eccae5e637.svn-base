@@ -1,0 +1,181 @@
+
+/* 分页样式 tcdPageCode */
+.tcdPageCodeBox{
+	overflow:hidden;
+	margin:10px 0;
+}
+.tcdPageCode {
+	padding: 20px 10px;
+	color: #fff;
+	float: right;
+}
+
+.tcdPageCode a {
+	display: inline-block;
+	color: #333;
+	display: inline-block;
+	height:32px;
+	width:36px;
+	line-height: 32px;
+	border: 1px solid #ddd;
+	margin: 0 2px;
+	border-radius: 4px;
+	text-align:center;
+	vertical-align: middle;
+}
+.tcdPageCode .shortcutBtn {
+    display: inline-block;
+    color: #333;
+    height:32px;
+    width:52px;
+    line-height: 32px;
+    border: 1px solid #ddd;
+    background-color:#fff;
+    margin: 0 2px;
+    border-radius: 4px;
+    text-align:center;
+    vertical-align: middle;
+    cursor:pointer;
+}
+.tcdPageCode .shortcutBtn:hover {
+	border:1px solid #428bca
+}
+
+
+.tcdPageCode a:hover {
+	text-decoration: none;
+	border: 1px solid #428bca;
+}
+
+.tcdPageCode span.current {
+	display: inline-block;
+	height: 32px;
+	line-height: 32px;
+	width:36px;
+	margin: 0 2px;
+	color: #fff;
+	background-color: #428bca;
+	border: 1px solid #428bca;
+	border-radius: 4px;
+	text-align:center;
+	vertical-align: middle;
+}
+
+.tcdPageCode .shortcutBtn.disabled {
+	display: inline-block;
+	height: 32px;
+	width:52px;
+	line-height: 32px;
+	margin: 0 2px;
+	color: #bfbfbf;
+	background: #f2f2f2;
+	border: 1px solid #bfbfbf;
+	border-radius: 4px;
+	text-align:center;
+	vertical-align: middle;
+}
+.tcdPageCode .shortcutBtn.disabled:hover{
+	cursor:default;
+    border: 1px solid #bfbfbf;
+}
+
+
+.tcdPageCode .Bars {
+	padding: 0 8px;
+}
+
+.tcdPageCode .Bars.selected {
+	background-color: #56a4ee;
+	color: #fff;
+}
+.tcdPageCode .jumpPageBox{
+	height:34px;
+	line-height:34px;
+	display:inline-block;
+	padding-left:10px;
+	color:#333;
+	vertical-align: middle;
+}
+.tcdPageCode .jumpPageBox .pageTotal{
+	padding:0 2px;
+	font:16px "Microsoft Yahei",Arial;
+}
+.tcdPageCode .jumpPageBox .jumpTo{
+	width: 30px; 
+	height: 24px; 
+	text-align: center; 
+	margin:5px;
+	border:1px solid #ccc;
+	font-size:16px;
+}
+.tcdPageCode .jumpPageBox .confirmJumpPage{
+	width: 48px; 
+	height: 24px; 
+	margin-left:5px;
+}
+
+.tcdPageCode1 {
+	padding: 20px;
+	text-align: left;
+	color: #ccc;
+	float: right;
+}
+
+.tcdPageCode1 a {
+	display: inline-block;
+	color: #333;
+	display: inline-block;
+	height: 32px;
+	line-height: 32px;
+	padding: 0 14px;
+	border: 1px solid #ddd;
+	margin: 0 2px;
+	border-radius: 4px;
+	vertical-align: middle;
+}
+
+.tcdPageCode1 a:hover {
+	text-decoration: none;
+	border: 1px solid #428bca;
+}
+
+.tcdPageCode1 span.current {
+	display: inline-block;
+	height: 32px;
+	line-height: 32px;
+	padding: 0 14px;
+	margin: 0 2px;
+	color: #fff;
+	background-color: #428bca;
+	border: 1px solid #428bca;
+	border-radius: 4px;
+	vertical-align: middle;
+}
+
+.tcdPageCode1 span.disabled {
+	display: inline-block;
+	height: 32px;
+	line-height: 32px;
+	padding: 0 14px;
+	margin: 0 2px;
+	color: #bfbfbf;
+	background: #f2f2f2;
+	border: 1px solid #bfbfbf;
+	border-radius: 4px;
+	vertical-align: middle;
+}
+
+.tcdPageCode1 .Bars {
+	padding: 0 8px;
+}
+
+.tcdPageCode1 .Bars.selected {
+	background-color: #56a4ee;
+	color: #fff;
+}
+
+.tcdPageBox {
+	background-color: #fff;
+	height: 80px
+}
+/*End tcdPageCode */

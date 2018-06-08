@@ -1,0 +1,101 @@
+package com.fm.utils;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import net.sf.json.JSONObject;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
+
+import com.google.gson.JsonObject;
+
+/**         
+ * 阿里云api接口  
+ * @author：lujianglin   
+ * @time：      2018年4月10日       
+ */
+public class AlibabaCloudAPI {
+	
+	/**
+	 * 移动联通基站定位
+     * AppSecret:d2615647bd2f45ddbc435d21f651fd5b
+     * AppCode:b38a9f7312af44d6ac4bfa79c9ca3237
+     * AppKey：24601498
+     * @return {"location":{"address":{"region":"江苏省","county":"吴中区","street":"星湖街",
+     * "street_number":"星湖街","city":"苏州市","country":"中国"},"addressDescription":"江苏省 苏州市 吴中区 星湖街 靠近商务汇大厦",
+     * "longitude":120.72505,"latitude":31.290253,"accuracy":null},"access_token":null,"ErrCode":"0"}
+
+     */
+	//location格式  lac,cell_id
+	public static JSONObject getlbs(String location) {
+		JSONObject returmJson = new JSONObject();
+		String[] loca = location.split(",");
+		String lac =loca[0];
+		String cell_id =loca[1];
+		String host = "http://getlbs.market.alicloudapi.com";
+		String path = "/api/getlbs";
+		String method = "POST";
+		String appcode = "b38a9f7312af44d6ac4bfa79c9ca3237";
+		JSONObject json = new JSONObject();
+		Map<String, String> headers = new HashMap<String, String>();
+		// 最后在header中的格式(中间是英文空格)为Authorization:APPCODE
+		// 83359fd73fe94948385f570e3c139105
+		headers.put("Authorization", "APPCODE " + appcode);
+		Map<String, String> querys = new HashMap<String, String>();
+		querys.put("lac", lac);// lac(电信对应nid)
+		querys.put("cell_id", cell_id);// 基站Id(电信对应bid)
+		querys.put("mcc", "460");// 国家代码：中国是460
+		//imsi=809 (mcc460 mnc01) 5886517596,国家代码和网络类型可以从imsi4-7位取
+		//querys.put("mnc", mnc);// 网络类型0移动1联通(电信对应sid)
+		querys.put("type", "0");// 返回坐标类型默认值 0(google坐标),1(百度坐标),2(gps坐标)
+		Map<String, String> bodys = new HashMap<String, String>();
+		try {
+	    	/**
+	    	* 重要提示如下:
+	    	* HttpUtils请从
+	    	* https://github.com/aliyun/api-gateway-demo-sign-java/blob/master/src/main/java/com/aliyun/api/gateway/demo/util/HttpUtils.java
+	    	* 下载
+	    	*
+	    	* 相应的依赖请参照
+	    	* https://github.com/aliyun/api-gateway-demo-sign-java/blob/master/pom.xml
+	    	*/
+	    	HttpResponse response = HttpUtils.doPost(host, path, method, headers, querys, bodys);
+	    	//获取response的body
+	    	//System.out.println(EntityUtils.toString(response.getEntity()));
+	    	String data = EntityUtils.toString(response.getEntity());
+	    	System.out.println(data);
+	    	if(judgeNull.String(data)){
+	    		json = JSONObject.fromObject(data);
+	    		if(json.get("ErrCode").equals("0")){
+	    			JSONObject  locat= (JSONObject) json.get("location");
+	    			JSONObject address = (JSONObject) locat.get("address");
+	    			returmJson.put("province", address.getString("region"));
+	    			returmJson.put("city", address.getString("county"));
+	    		}else{
+	    			returmJson.put("province", "未知");
+	    			returmJson.put("city", "未知");
+	    		}
+	    	}else{
+	    		returmJson.put("province", "查询接口已用完");
+    			returmJson.put("city", "");
+	    	}
+			System.out.println(returmJson);
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }
+		return returmJson;
+	}
+	public static void main(String[] args) {
+		getlbs("34860,62042");
+		String string ="{\"location\":{\"address\":{\"region\":\"云南省\",\"county\":\"景洪市\",\"street\":\"嘎栋乡\",\"street_number\":\"曼东\",\"city\":\"西双版纳傣族自治州\",\"country\":\"中国\"},\"addressDescription\":\"云南省西双版纳傣族自治州景洪市嘎栋乡曼东泰和园西南\",\"longitude\":100.74965,\"latitude\":22.01303,\"accuracy\":\"1500\"},\"access_token\":null,\"ErrCode\":\"0\"}";
+		
+	}
+	
+	
+	
+	
+	
+	
+
+}

@@ -1,0 +1,394 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+    pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<title>用户管理</title>
+<%@ include file="include/header.jsp"%>
+<!-- 时间控件 -->
+<script type="text/javascript" src="${ip}/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+</head>
+<body>
+
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户中心 <span class="c-gray en">&gt;</span> 用户管理 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+  <div class="text-c">  日期范围：
+		<input type="text" onfocus="WdatePicker({ maxDate:'#F{$dp.$D(\'datemax\')||\'%y-%M-%d\'}' })" id="datemin" class="input-text Wdate" style="width:120px;">
+		-
+		<input type="text" onfocus="WdatePicker({ minDate:'#F{$dp.$D(\'datemin\')}',maxDate:'%y-%M-%d' })" id="datemax" class="input-text Wdate" style="width:120px;">
+		<input type="text" class="input-text" style="width:250px" placeholder="输入会员名称、电话、邮箱" id="sousuoyonghu" name="">
+    <button type="submit" class="btn btn-success" id="fquery" name="" onclick="fquery();"><i class="icon-search"></i> 搜用户</button>
+
+  </div>
+  <div class="cl pd-5 bg-1 bk-gray mt-20">
+    <span class="l"><a href="javascript:;" onclick="delchecked()" class="btn btn-danger radius"><i class="icon-trash"></i> 批量删除</a>
+    <a href="javascript:;" onclick="add()" class="btn btn-primary radius"><i class="icon-plus"></i> 添加用户</a></span>
+    <span class="r">共有数据：<strong>${count }</strong> 条</span><span class="r">当前在第：<strong>${page }</strong> 页，</span>
+  </div>
+  <table class="table table-border table-bordered table-hover table-bg table-sort" style="margin-top: 20px;">
+    <thead>
+      <tr class="text-c">
+        <th width="25"><input type="checkbox" id="allboxs" name="" value=""></th>
+        <th width="40">用户ID</th>
+        <th width="100">用户名称</th>
+        <th width="200">用户密码</th>
+        <th width="100">用户手机</th>
+        <th width="60">真实姓名</th>
+        <th width="60">用户积分</th>
+        <th width="150">用户头像</th>
+        <th width="200">注册时间</th>
+        <th width="50">状态</th>
+        <th width="">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <c:forEach items="${userlist }" var="list" varStatus="rs">
+		<tr class="text-c" id="">
+			<td><input type="checkbox" value="${list.userId }" name="boxs"></td>
+			<td>${list.userId }</td>
+			<td>${list.userName }</td>
+			<td>${list.password }</td>
+			<td>${list.userPhone }</td>
+			<td>${list.realName }</td>
+			<td>${list.userIntegral }</td>
+			<td>${list.userPhoto }</td>
+			<td><fmt:formatDate value="${list.addTime }" pattern="YYYY-MM-dd HH:mm:ss" /></td>
+			<c:if test="${list.isAble == 1 }">
+				<td class="user-status"><span class="label label-success">已启用</span></td>
+			</c:if>
+			<c:if test="${list.isAble == 0 }">
+				<td class="user-status"><span class="label radius">已停用</span></td>
+			</c:if>
+			<td><a href="javascript:void(0);" onclick="updF(${list.userId });">修改</a>&nbsp;&nbsp;<a href="javascript:void(0);" onclick="delF(${list.userId });">删除</a></td>
+		</tr>
+	
+	</c:forEach>
+    </tbody>
+  </table>
+  
+  	<!-- 模态框（Modal） -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display:none;">
+		<div class="modal-dialog">
+			<div class="modal-content" style="width: 480px;">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						&times;
+					</button>
+					<h3 class="modal-title" style="line-height: 5px;" id="myModalLabel">
+						<strong>标题</strong>
+					</h3>
+				</div>
+				<div class="modal-body" style="text-align: center;">
+					
+					<table>
+						<tr style="display:none;">
+							<td><label><a style="color: red;">*</a>用户ID：</label></td>
+							<td><input type="hidden" class="input-text" style="width:250px" id="userid" name="" /></td>
+						</tr>
+						<tr>
+							<td><label><a style="color: red;">*</a>用户名称：</label></td>
+							<td><input type="text" class="input-text" style="width:250px" placeholder="输入用户名称" id="username" name="" /></td>
+						</tr>
+						<tr>
+							<td><label><a style="color: red;">*</a>密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码：</label></td>
+							<td><input type="text" class="input-text" style="width:250px" placeholder="输入用户密码" id="password" name="" /></td>
+						</tr>
+						<tr>
+							<td><label><a style="color: red;">*</a>&nbsp;真实姓名：</label></td>
+							<td><input type="text" class="input-text" style="width:250px" placeholder="输入真实姓名" id="realname" name="" /></td>
+						</tr>
+						<tr>
+							<td><label><a style="color: red;">*</a>电&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;话：</label></td>
+							<td><input type="text" class="input-text" style="width:250px" placeholder="输入用户电话号码" id="userphone" name="" /></td>
+						</tr>
+						<tr>
+							<td><label><a style="color: red;">*</a>&nbsp;用户积分：</label></td>
+							<td><input type="text" class="input-text" style="width:250px" placeholder="输入用户积分" id="userintegral" name="" /></td>
+						</tr>
+						<tr>
+							<td><label><a style="color: red;">*</a>&nbsp;用户头像：</label></td>
+							<td><input type="text" class="input-text" style="width:250px" placeholder="输入用户头像" id="userphoto" name="" /></td>
+						</tr>
+						<tr>
+							<td><label><a style="color: red;">*</a>&nbsp;所属主账号：</label></td>
+							<td><input type="text" class="input-text" style="width:250px" placeholder="输入用户所属账号" id="" name="" /></td>
+						</tr>
+						<tr>
+							<td><label><a style="color: red;">*</a>&nbsp;是否有效：</label></td>
+							<td><input type="text" class="input-text" style="width:250px" placeholder="1为有效，0为无效" id="isable" name="" /></td>
+						</tr>
+						<tr>
+							<td><label><a style="color: red;">*</a>&nbsp;注册时间：</label></td>
+							<td><input type="text" class="input-text" style="width:250px" placeholder="时间格式：YYYY-MM-DD HH:mm:ss" disabled id="addtime" name="" /></td>
+						</tr>
+					</table>
+					
+				</div>
+				<div class="modal-footer">
+					<!-- <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button> -->
+					<button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+					<button type="button" id="keep" class="btn btn-primary" onclick="updU();">保存</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+  
+	<!-- 分页 -->
+  <div class="table-list-food tcdPageBox">
+		<div class="tcdPageCode"></div>
+		<!-- 总数量 -->
+		<input type="hidden" class="count" value="${count }"/>
+		<!-- 总页数 -->
+		<input type="hidden" class="pageSize" value="${pageSize }"/>
+		<!-- 当前页 -->
+		<input type="hidden" class="page" value="${page }"/>
+	</div>
+</div>
+<!-- session回显和清除所有session处理 -->
+<script type="text/javascript">
+$('#sousuoyonghu').val(sessionStorage.getItem('sousuoyonghu'));   //回显搜索用户框
+$('#datemin').val(sessionStorage.getItem('datemin'));   //回显开始时间
+$('#datemax').val(sessionStorage.getItem('datemax'));   //回显结束时间
+sessionStorage.clear();   //第一次进入页面清除所有session
+</script>
+
+<!--分页-->
+<script type="text/javascript">
+//创建分页 
+$(".tcdPageCode").createPage({
+    pageCount:$(".pageSize").val(),
+    current:parseInt($(".page").val()),
+    backFn:function(p){
+        console.log(p);
+        window.location.href = "${ip}/user/userlist?page=" + p + "&sousuoyonghu=" + $('#sousuoyonghu').val() + "&datemin=" + $('#datemin').val() + "&datemax=" + $('#datemax').val();//更新后跳转
+        updatePage();
+    }
+});
+//刷新分页页数  
+function updatePage(){
+	sessionStorage.setItem('sousuoyonghu',$('#sousuoyonghu').val());    //回显搜索用户框
+	sessionStorage.setItem('datemin',$('#datemin').val());    //回显开始时间
+	sessionStorage.setItem('datemax',$('#datemax').val());    //回显结束时间
+	if($(".pageSize").val()>0){
+		$(".tcdPageBox").show();
+	}else{
+		$(".tcdPageBox").hide();
+	}
+	$(".tcdPageCode").ajaxcreatePage({
+		pageCount : $(".pageSize").val(),
+		current : parseInt($(".page").val()),
+	});
+}
+</script>
+<!--主体js-->
+<script type="text/javascript">
+var Url = "${ip}/user/userlist?page=" + $('.page').val() + "&sousuoyonghu=" + $('#sousuoyonghu').val() + "&datemin=" + $('#datemin').val() + "&datemax=" + $('#datemax').val();
+
+//搜索框按钮事件
+function fquery(){
+	window.location.href = "${ip}/user/userlist?page=" + 1 + "&sousuoyonghu=" + $('#sousuoyonghu').val() + "&datemin=" + $('#datemin').val() + "&datemax=" + $('#datemax').val();//更新后跳转
+    updatePage();
+}
+
+//新增方法
+function add(){
+	$('#myModalLabel').html("新增用户");
+	$('#keep').attr('onclick','adduser()');
+	
+	//清空数据
+	$('#userid').val('');
+	$('#username').val('');
+	$('#password').val('');
+	$('#realname').val('');
+	$('#userphone').val('');
+	$('#userintegral').val('');
+	$('#userphoto').val('');
+	$('#isable').val('');
+	var time = new Date();
+	//$('#addtime').attr('value',timestampToTime(time));
+	$('#addtime').val(timestampToTime(time));
+	
+	$('#myModal').modal('show');//弹出
+}
+
+//新增方法保存
+function adduser(){
+	var username = $('#username').val();
+	var password = $('#password').val();
+	var realname = $('#realname').val();
+	var userphone = $('#userphone').val();
+	var userintegral = $('#userintegral').val();
+	var userphoto = $('#userphoto').val();
+	var isable = $('#isable').val();
+	var addtime = $('#addtime').val();
+	
+	$.ajax({
+  		url:"adduser",
+  		type:"POST",
+  		data: {
+  			'username':username,
+  			'password':password,
+  			'realname':realname,
+  			'userphone':userphone,
+  			'userintegral':userintegral,
+  			'userphoto':userphoto,
+  			'isable':isable
+  			},
+  		dataType: "text",
+  		async:false,
+    	success:function(data){
+    		//alert(data);
+        	$('#myModal').modal('hide');//隐藏
+        	alert("添加用户成功！");
+      	 	window.location.href = Url;   //更新后跳转
+      	 	updatePage();
+  		},
+  		error: function(XMLHttpRequest, textStatus, errorThrown) {
+           alert(XMLHttpRequest.status);
+           alert(XMLHttpRequest.readyState);
+           alert(textStatus);
+       }
+	});
+}
+
+//修改方法
+function updF(id){
+	//alert("修改："+id);
+	$('#myModalLabel').html("修改用户");
+	$('#keep').attr('onclick','updU()');
+	$.ajax({
+  		url:"toUpdateUser",
+  		type:"POST",
+  		data: {'uid':id},
+  		dataType: "json", //只返回了update，所以用text
+    	success:function(data){
+    		//alert(data);
+    		$('#userid').val(data.userId);
+    		$('#username').val(data.userName);
+    		$('#password').val(data.password);
+    		$('#realname').val(data.realName);
+    		$('#userphone').val(data.userPhone);
+    		$('#userintegral').val(data.userIntegral);
+    		$('#userphoto').val(data.userPhoto);
+    		$('#isable').val(data.isAble);
+    		$('#addtime').val(timestampToTime(data.addTime));
+        	$('#myModal').modal('show');//弹出
+  		},
+  		error:function(e){
+  			console.log(e)
+      		alert("数据获取失败");
+  		}
+  		
+	});
+}
+
+//修改方法保存
+function updU(){
+	var id = $('#userid').val();
+	//alert("修改："+id);
+	var username = $('#username').val();
+	var password = $('#password').val();
+	var realname = $('#realname').val();
+	var userphone = $('#userphone').val();
+	var userintegral = $('#userintegral').val();
+	var userphoto = $('#userphoto').val();
+	var isable = $('#isable').val();
+	var addtime = $('#addtime').val();
+	
+	$.ajax({
+  		url:"updateUser",
+  		type:"POST",
+  		data: {
+  			'uid':id,
+  			'username':username,
+  			'password':password,
+  			'realname':realname,
+  			'userphone':userphone,
+  			'userintegral':userintegral,
+  			'userphoto':userphoto,
+  			'isable':isable
+  			},
+  		dataType: "text", //只返回了update，所以用text
+  		async:false,
+    	success:function(data){
+    		
+        	$('#myModal').modal('hide');//隐藏
+        	alert("修改用户成功！");
+        	window.location.href = Url;  //更新后跳转
+      	 	updatePage();
+  		},
+  		/* error:function(e){
+  			console.log(e)
+      		alert("数据获取失败");
+  		}  */
+  		error: function(XMLHttpRequest, textStatus, errorThrown) {
+           alert(XMLHttpRequest.status);
+           alert(XMLHttpRequest.readyState);
+           alert(textStatus);
+       }
+	});
+}
+
+//删除方法
+function delF(id){
+	//alert("删除："+id);
+	if(confirm("您确定要删除该用户吗？")){
+ 		$.ajax({
+   		url:"delUser",
+   		type:"POST",
+   		data: {'uid':id},
+   		dataType: "text", //只返回了update，所以用text
+     	success:function(data){
+			alert("删除用户成功！");
+        	//console.log(data);
+        	window.location.href = Url; //更新后跳转
+      	 	updatePage();
+   		},
+   		error: function(XMLHttpRequest, textStatus, errorThrown) {
+               alert(XMLHttpRequest.status);
+               alert(XMLHttpRequest.readyState);
+               alert(textStatus);
+           }
+ 		});
+	}
+}
+
+
+
+//批量删除
+function delchecked(){
+	$("input[name='boxs']").each(function(){
+		if($(this).get(0).checked){
+			//console.log($(this).get(0).value);
+			delF($(this).get(0).value);
+		}
+	});
+	//还可以弄成集合，扔给后台处理删除
+}
+
+//时间戳格式转换
+function timestampToTime(timestamp) {
+    var date = new Date(timestamp);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+    Y = date.getFullYear() + '-';
+    M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+    D = (date.getDate() < 10 ? '0'+(date.getDate()) + ' ' : date.getDate() + ' ');
+    h = (date.getHours() < 10 ? '0'+(date.getHours()) + ':' : date.getHours() + ':');
+    m = (date.getMinutes() < 10 ? '0'+(date.getMinutes()) + ':' : date.getMinutes() + ':');
+    s = (date.getSeconds() < 10 ? '0'+(date.getSeconds()) : date.getSeconds());
+    return Y+M+D+h+m+s;
+}
+
+</script>
+</body>
+</html>

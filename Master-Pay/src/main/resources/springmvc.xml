@@ -1,0 +1,106 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-4.3.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+            http://www.springframework.org/schema/mvc
+            http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+            http://www.springframework.org/schema/context 
+            http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+
+
+	<!-- 全局异常处理器 只要实现 HandlerExceptionResolver 接口就是全局异常处理器 全局异常处理器只能有一个 <bean 
+		id="dddd" class="com.fm.exception.CustomExceptionResolver" /> -->
+
+	<!-- 组件扫描:可以扫描 controller、service、... 这里让扫描 controller 指定 controller 的包 -->
+	<context:annotation-config/>
+	<context:component-scan base-package="com.fm.controller,com.fm.date.converter,com.fm.interceptor,com.fm.utils,com.fm.timer" />
+
+	<!-- 视图解析器 -->
+	<!-- 解析 jsp 视图，默认使用 jstl 标签，classpath下的得有 jstl 的包 配置 jsp 所在的路径 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
+		<property name="prefix" value="/" /> 
+		<property name="suffix" value=".jsp"/> 
+	</bean>
+
+	<!-- 静态资源解析 包括：js、css、images.... -->
+	<!-- <mvc:resources location="/resources/" mapping="/resources/**" />
+	<mvc:resources location="/swagger/" mapping="/swagger/**" />
+	<mvc:resources location="/views/" mapping="/views/**" />
+	<mvc:resources location="/index.html" mapping="/index.html" /> -->
+
+	<!-- 使用mva:mvc:annotation-driven代替注解映射器和注解适配器配置 默认加载很多的参数绑定方法、比如：json转换解析器就默认加载了、如果使用这个就不用配置上边两个配置了 
+		实际开发时使用 注入自定义参数绑定 :conversion-service="conversionService" 注入校验器:validator="validator" -->
+	<!-- 用户于解决 augularJs 乱码问题 -->
+	<!-- 处理请求返回json字符串的中文乱码问题 -->
+	<mvc:annotation-driven conversion-service="conversionService">
+		<mvc:message-converters>
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+				<property name="supportedMediaTypes">
+					<list>
+						<value>application/json;charset=UTF-8</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+	<!-- 自定义参数绑定 conversionService -->
+	<bean id="conversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<!-- 转换器 -->
+		<property name="converters">
+			<list>
+				<!-- String 转 Date -->
+				<bean class="com.fm.date.converter.CustomDateConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 校验器 -->
+	<!-- <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"> 
+		Hibernate 校验器 <property name="providerClass" value="org.hibernate.validator.HibernateValidator" 
+		/> 指定校验使用的资源文件，在文件中配置校验错误信息 如果不指定则默认使用 classpath 下的 ValidationMessages.properties 
+		<property name="validationMessageSource" ref="messageSource" /> </bean> 校验错误信息配置文件 
+		<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource"> 
+		资源文件名 <property name="basenames"> <list> <value>classpath:ErrorMessages</value> 
+		</list> </property> 资源文件编码格式 <property name="fileEncodings" value="utf-8" 
+		/> 对资源文件内容缓存时间，单位秒 <property name="cacheSeconds" value="120" /> </bean> -->
+
+
+
+	<!-- 文件上传 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 设置上传文件的大小最大限制为 5MB -->
+		<property name="maxUploadSize">
+			<!-- 以字节为单位 -->
+			<value>5242880</value>
+		</property>
+	</bean>
+
+	<!-- 拦截器 -->
+	<!-- 多个拦截器，顺序执行 -->
+	<!-- <mvc:interceptors> <mvc:interceptor> <mvc:mapping path="/web/**" /> 
+		<bean class="com.fm.hotel.interceptor.LoginInterceptor"></bean> </mvc:interceptor> 
+		</mvc:interceptors> -->
+
+<!-- 拦截器配置 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/jsp/**"/>
+			<mvc:exclude-mapping path="/static/**"/>
+			<mvc:exclude-mapping path="/temp/**"/>
+			<bean class="com.fm.interceptor.SecurityInterceptor"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors> 
+</beans>
